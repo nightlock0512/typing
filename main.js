@@ -1,14 +1,14 @@
+/**
+ * ひらがなをローマ字に変換し、考えられるすべてのパターンを配列で返す関数
+ * @param {string} hiraganaStr 変換したいひらがなの文字列
+ * @returns {string[]} ローマ字に変換された文字列の配列
+ */
 function hiraganaToRomaji(hiraganaStr) {
-    /**
-     * ひらがなをローマ字に変換し、考えられるすべてのパターンを配列で返す関数
-     * @param {string} hiraganaStr 変換したいひらがなの文字列
-     * @returns {string[]} ローマ字に変換された文字列の配列
-     */
     const romajiMap = {
         "あ": ["a"], "い": ["i"], "う": ["u"], "え": ["e"], "お": ["o"],
         "か": ["ka"], "き": ["ki"], "く": ["ku"], "け": ["ke"], "こ": ["ko"],
         "さ": ["sa"], "し": ["shi", "si"], "す": ["su"], "せ": ["se"], "そ": ["so"],
-        "た": ["ta"], "ち": ["chi", "ti"], "つ": ["tsu", "tu"], "て": ["te"], "と": ["to"],
+        "た": ["ta"], "ち": ["ti", "chi"], "つ": ["tu", "tsu"], "て": ["te"], "と": ["to"],
         "な": ["na"], "に": ["ni"], "ぬ": ["nu"], "ね": ["ne"], "の": ["no"],
         "は": ["ha"], "ひ": ["hi"], "ふ": ["fu", "hu"], "へ": ["he"], "ほ": ["ho"],
         "ま": ["ma"], "み": ["mi"], "む": ["mu"], "め": ["me"], "も": ["mo"],
@@ -165,6 +165,9 @@ const observer = new IntersectionObserver((entry) => {
 observer.observe(display);
 observer.observe(result);
 
+/**
+ * 次の問題をセットする関数
+ */
 function setNext() {
     current_typed = "";
     centenec = centenec_list[Math.floor(centenec_list.length * Math.random())];
@@ -178,6 +181,9 @@ function setNext() {
 }
 setNext();
 
+/**
+ * cpm,raw,mis,accの平均,最大,最小を表示する関数
+ */
 function setSummary() {
     const cpm_min_elm = document.querySelector('.summary .cpm .min');
     const cpm_max_elm = document.querySelector('.summary .cpm .max');
@@ -244,6 +250,9 @@ function setSummary() {
 
 }
 
+/**
+ * ミスタイプのキーマップを生成
+ */
 function setMisskeys() {
     let max = 0;
     miss_ratio = [];
@@ -261,6 +270,9 @@ function setMisskeys() {
     });
 }
 
+/**
+ * 記録の一覧表を生成
+ */
 function setRecode() {
     recode_tabele.innerHTML = '<tr class="headline"><th>CPM</th><th>RAW</th><th>MIS</th><th>ACC</th></tr>';
     results.toReversed().forEach((result) => {
