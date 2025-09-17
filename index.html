@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タイピング</title>
+    <link rel="shortcut icon" href="icon.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="body_wrap">
+        <div class="container">
+            <div class="score">
+                cpm: <span class="cpm"></span>
+                raw: <span class="raw"></span>
+                mis: <span class="mis"></span>
+                acc: <span class="acc"></span>
+            </div>
+            <div class="display">
+                <div class="kanji"></div>
+                <div class="kana"></div>
+                <div class="roma"></div>
+            </div>
+        </div>
+        <div class="result_wrap">
+            <div class="result">
+                <section class="summary">
+                    <div class="cpm">
+                        <div class="label">
+                            CPM
+                        </div>
+                        <div class="value">
+                            <span class="type">min</span> : <span class="min"></span><br>
+                            <span class="type">max</span> : <span class="max"></span><br>
+                            <span class="type">ave</span> : <span class="ave"></span>
+                        </div>
+                    </div>
+                    <div class="raw">
+                        <div class="label">
+                            RAW
+                        </div>
+                        <div class="value">
+                            <span class="type">min</span> : <span class="min"></span><br>
+                            <span class="type">max</span> : <span class="max"></span><br>
+                            <span class="type">ave</span> : <span class="ave"></span>
+                        </div>
+                    </div>
+                    <div class="mis">
+                        <div class="label">
+                            MIS
+                        </div>
+                        <div class="value">
+                            <span class="type">min</span> : <span class="min"></span><br>
+                            <span class="type">max</span> : <span class="max"></span><br>
+                            <span class="type">ave</span> : <span class="ave"></span>
+                        </div>
+                    </div>
+                    <div class="acc">
+                        <div class="label">
+                            ACC
+                        </div>
+                        <div class="value">
+                            <span class="type">min</span> : <span class="min"></span><br>
+                            <span class="type">max</span> : <span class="max"></span><br>
+                            <span class="type">ave</span> : <span class="ave"></span>
+                        </div>
+                    </div>
+                </section>
+                <section class="miss_data">
+                    <div style="font-size: 1.3em;">Missed Keys</div>
+                    <div class="keyboard">
+                        <div class="keyboard-row">
+                            <span class="key"></span>
+                            <span class="key" data-value="1">1</span>
+                            <span class="key" data-value="2">2</span>
+                            <span class="key" data-value="3">3</span>
+                            <span class="key" data-value="4">4</span>
+                            <span class="key" data-value="5">5</span>
+                            <span class="key" data-value="6">6</span>
+                            <span class="key" data-value="7">7</span>
+                            <span class="key" data-value="8">8</span>
+                            <span class="key" data-value="9">9</span>
+                            <span class="key" data-value="0">0</span>
+                            <span class="key" data-value="-">-</span>
+                            <span class="key" data-value="^">^</span>
+                            <span class="key" data-value="\">\</span>
+                            <span class="key"></span>
+                        </div>
+                        <div class="keyboard-row">
+                            <span class="key tab"></span>
+                            <span class="key" data-value="q">Q</span>
+                            <span class="key" data-value="w">W</span>
+                            <span class="key" data-value="e">E</span>
+                            <span class="key" data-value="r">R</span>
+                            <span class="key" data-value="t">T</span>
+                            <span class="key" data-value="y">Y</span>
+                            <span class="key" data-value="u">U</span>
+                            <span class="key" data-value="i">I</span>
+                            <span class="key" data-value="o">O</span>
+                            <span class="key" data-value="p">P</span>
+                            <span class="key">@</span>
+                            <span class="key">[</span>
+                            <span class="key enter"></span>
+                        </div>
+                        <div class="keyboard-row">
+                            <span class="key caps"></span>
+                            <span class="key" data-value="a">A</span>
+                            <span class="key" data-value="s">S</span>
+                            <span class="key" data-value="d">D</span>
+                            <span class="key" data-value="f">F</span>
+                            <span class="key" data-value="g">G</span>
+                            <span class="key" data-value="h">H</span>
+                            <span class="key" data-value="j">J</span>
+                            <span class="key" data-value="k">K</span>
+                            <span class="key" data-value="l">L</span>
+                            <span class="key" data-value=";">;</span>
+                            <span class="key" data-value=":">:</span>
+                            <span class="key">]</span>
+                            <span class="key"></span>
+                        </div>
+                        <div class="keyboard-row">
+                            <span class="key shift"></span>
+                            <span class="key" data-value="z">Z</span>
+                            <span class="key" data-value="x">X</span>
+                            <span class="key" data-value="c">C</span>
+                            <span class="key" data-value="v">V</span>
+                            <span class="key" data-value="b">B</span>
+                            <span class="key" data-value="n">N</span>
+                            <span class="key" data-value="m">M</span>
+                            <span class="key" data-value=",">,</span>
+                            <span class="key" data-value=".">.</span>
+                            <span class="key" data-value="?">?</span>
+                            <span class="key shift"></span>
+                        </div>
+                    </div>
+                </section>
+                <section class="recodes">
+                    <table>
+                        <tr class="headline">
+                            <th>CPM</th>
+                            <th>RAW</th>
+                            <th>MIS</th>
+                            <th>ACC</th>
+                        </tr>
+                    </table>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="text_list.js"></script>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
