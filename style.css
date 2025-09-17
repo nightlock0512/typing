@@ -115,6 +115,10 @@
 
 .miss_data {
     margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 .keyboard {
@@ -125,7 +129,8 @@
     background-color: silver;
     border-radius: 10px;
     margin-top: 15px;
-    max-width: 1000px;
+    width: 1000px;
+    max-width: 85vw;
 }
 
 .keyboard-row {

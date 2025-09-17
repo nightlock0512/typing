@@ -141,6 +141,7 @@ const results = [];
 let miss = 0;
 const miss_data = {};
 let miss_ratio = [];
+let isFirstMiss = true;
 let start_time;
 
 let current_typed = "";
@@ -150,9 +151,19 @@ let roma_list;
 
 let isDisplayInView = true;
 const observer = new IntersectionObserver((entry) => {
-    isDisplayInView = entry[0].isIntersecting;
+    entry.forEach((elm)=>{
+        if (elm.target == display) {
+            isDisplayInView = entry[0].isIntersecting;
+        }
+        if (elm.target == result && elm.isIntersecting) {
+            setSummary();
+            setMisskeys();
+            setRecode();
+        }
+    });
 });
 observer.observe(display);
+observer.observe(result);
 
 function setNext() {
     current_typed = "";
@@ -234,20 +245,18 @@ function setSummary() {
 }
 
 function setMisskeys() {
-    let sum = 0;
+    let max = 0;
     miss_ratio = [];
 
-    Object.values(miss_data).forEach(val=>sum += val);
+    Object.values(miss_data).forEach(val=>max = max > val ? max : val);
     Object.entries(miss_data).forEach(val=>{
-        miss_ratio.push([val[0],val[1] / sum]);
+        miss_ratio.push([val[0],val[1] / max]);
     });
     
     miss_ratio.forEach(val => {
         if (document.querySelector(`.keyboard .key[data-value="${val[0]}"]`) == undefined) {
-            console.log(val)
             return;
         }
-        console.log(val)
         document.querySelector(`.keyboard .key[data-value="${val[0]}"]`).style.background = `hsl(0 100% ${100 - 50 * val[1]}%)`;
     });
 }
@@ -306,15 +315,19 @@ document.addEventListener('keypress', (e) => {
                 setNext();
             }
 
+            isFirstMiss = true;
+
             break;
         } else if (i == roma_list.length - 1) {
             let r = current_roma.substring(current_typed.length, current_typed.length + 1);
-            console.log(r)
             miss++;
-            if (miss_data[r] != undefined) {
-                miss_data[r]++;
-            } else {
-                miss_data[r] = 1;
+            if (isFirstMiss) {
+                if (miss_data[r] != undefined) {
+                    miss_data[r]++;
+                } else {
+                    miss_data[r] = 1;
+                }
+                isFirstMiss = false;
             }
             acc_elm.innerHTML = Math.floor(current_typed.length / (current_typed.length + miss) * 1000) / 10 + "%";
             cpm_elm.innerHTML = Math.floor(current_typed.length / (time / 1000) * 60 * 10) / 10;
