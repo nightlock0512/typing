@@ -146,6 +146,7 @@ let start_time;
 
 let current_typed = "";
 let current_roma = "";
+let current_miss_data = {};
 let centenec;
 let roma_list;
 
@@ -287,14 +288,17 @@ document.addEventListener('keypress', (e) => {
     if (e.key == 'Enter') {
         if (isDisplayInView) {
             if (!e.shiftKey) {
+                // タイピング画面でEnterで結果表示
                 setSummary();
                 setRecode();
                 setMisskeys();
                 summary.scrollIntoView({ behavior: "smooth" });
             } else {
+                // Shift+Enterで次の問題へ
                 setNext();
             }
         } else {
+            // 結果画面でEnterでトップへ
             container.scrollIntoView({ behavior: "smooth" });
             setNext();
         }
@@ -303,6 +307,7 @@ document.addEventListener('keypress', (e) => {
 
     if (!isDisplayInView) return;
 
+    // タイピング処理
     if (current_typed.length == 0 && miss == 0) {
         start_time = new Date();
     }
@@ -324,6 +329,16 @@ document.addEventListener('keypress', (e) => {
 
             if (current_roma === current_typed) {
                 results.push({ cpm: cpm, raw: raw, acc: acc, mis: miss });
+                
+                for (const key in current_miss_data) {
+                    if (miss_data.hasOwnProperty(key)) {
+                        miss_data[key] += current_miss_data[key];
+                    } else {
+                        miss_data[key] = current_miss_data[key];
+                    }
+                }
+                current_miss_data = {};
+
                 setNext();
             }
 
@@ -334,10 +349,10 @@ document.addEventListener('keypress', (e) => {
             let r = current_roma.substring(current_typed.length, current_typed.length + 1);
             miss++;
             if (isFirstMiss) {
-                if (miss_data[r] != undefined) {
-                    miss_data[r]++;
+                if (current_miss_data[r] != undefined) {
+                    current_miss_data[r]++;
                 } else {
-                    miss_data[r] = 1;
+                    current_miss_data[r] = 1;
                 }
                 isFirstMiss = false;
             }
