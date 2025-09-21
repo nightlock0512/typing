@@ -137,9 +137,14 @@ const result = document.querySelector('.result');
 const summary = document.querySelector('.summary');
 const recode_tabele = document.querySelector('.recodes table');
 
-const results = [];
+// データベース
+const DB = new Dexie('hogetyping');
+DB.version(1).stores({
+    result: '++id,date,mode,cpm,raw,mis,acc,miss_data'
+});
+
+let results = [];
 let miss = 0;
-const miss_data = {};
 let miss_ratio = [];
 let isFirstMiss = true;
 let start_time;
@@ -157,9 +162,7 @@ const observer = new IntersectionObserver((entry) => {
             isDisplayInView = entry[0].isIntersecting;
         }
         if (elm.target == result && elm.isIntersecting) {
-            setSummary();
-            setMisskeys();
-            setRecode();
+            setResult();
         }
     });
 });
@@ -257,6 +260,17 @@ function setSummary() {
 function setMisskeys() {
     let max = 0;
     miss_ratio = [];
+    let miss_data = {};
+
+    results.forEach(result => {
+        Object.entries(result['miss_data']).forEach(val=>{
+            if (miss_data[val[0]] == undefined) {
+                miss_data[val[0]] = val[1];
+            } else {
+                miss_data[val[0]] += val[1];
+            }
+        });
+    });
 
     Object.values(miss_data).forEach(val=>max = max > val ? max : val);
     Object.entries(miss_data).forEach(val=>{
@@ -284,14 +298,35 @@ function setRecode() {
     })
 }
 
+/**
+ * 結果を表示する関数
+ */
+async function setResult() {
+    DB.result.toArray().then(data => {
+        results = data;
+        setSummary();
+        setRecode();
+        setMisskeys();
+    });
+}
+
+/**
+ * 結果を保存する関数
+ * @param {Object} 結果配列
+ */
+async function saveResult(results) {
+    try {
+        await DB.result.add(results);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 document.addEventListener('keypress', (e) => {
     if (e.key == 'Enter') {
         if (isDisplayInView) {
             if (!e.shiftKey) {
                 // タイピング画面でEnterで結果表示
-                setSummary();
-                setRecode();
-                setMisskeys();
                 summary.scrollIntoView({ behavior: "smooth" });
             } else {
                 // Shift+Enterで次の問題へ
@@ -315,6 +350,7 @@ document.addEventListener('keypress', (e) => {
     let time = current_time.getTime() - start_time.getTime();
     for (let i = 0; i < roma_list.length; i++) {
         const roma = roma_list[i];
+        // 正解判定
         if (roma.substring(0, current_typed.length + 1) === current_typed + e.key) {
             current_roma = roma;
             current_typed += e.key;
@@ -327,17 +363,17 @@ document.addEventListener('keypress', (e) => {
             raw_elm.innerHTML = raw;
             mis_elm.innerHTML = miss;
 
+            // 終了判定
             if (current_roma === current_typed) {
-                results.push({ cpm: cpm, raw: raw, acc: acc, mis: miss });
-                
-                for (const key in current_miss_data) {
-                    if (miss_data.hasOwnProperty(key)) {
-                        miss_data[key] += current_miss_data[key];
-                    } else {
-                        miss_data[key] = current_miss_data[key];
-                    }
-                }
-                current_miss_data = {};
+                saveResult({
+                    date: new Date(),
+                    mode: 'japanese-nomal',
+                    cpm: cpm,
+                    raw: raw,
+                    mis: miss,
+                    acc: acc,
+                    miss_data: current_miss_data,
+                });
 
                 setNext();
             }
