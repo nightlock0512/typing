@@ -21,6 +21,7 @@ function hiraganaToRomaji(hiraganaStr) {
         "だ": ["da"], "ぢ": ["di"], "づ": ["du"], "で": ["de"], "ど": ["do"],
         "ば": ["ba"], "び": ["bi"], "ぶ": ["bu"], "べ": ["be"], "ぼ": ["bo"],
         "ぱ": ["pa"], "ぴ": ["pi"], "ぷ": ["pu"], "ぺ": ["pe"], "ぽ": ["po"],
+        "んあ": ["nna", "n'a"], "んい": ["nni", "n'i"], "んう": ["nnu", "n'u"], "んえ": ["nne", "n'e"], "んお": ["nno", "n'o"],
         "ふぁ": ["fa"], "ふぃ": ["fi"], "ふぇ": ["fe"], "ふぉ": ["fo"],
         "てゃ": ["tha"], "てぃ": ["thi"], "てゅ": ["thu"], "てぇ": ["the"], "てょ": ["tho"],
         "きゃ": ["kya"], "きゅ": ["kyu"], "きょ": ["kyo"],
@@ -295,7 +296,7 @@ function setRecode() {
         elm.classList.add('recode');
         elm.innerHTML = `<td>${result['cpm']}</td><td>${result['raw']}</td><td>${result['mis']}</td><td>${result['acc']}</td>`;
         recode_tabele.appendChild(elm);
-    })
+    });
 }
 
 /**
