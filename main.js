@@ -21,19 +21,21 @@ function hiraganaToRomaji(hiraganaStr) {
         "だ": ["da"], "ぢ": ["di"], "づ": ["du"], "で": ["de"], "ど": ["do"],
         "ば": ["ba"], "び": ["bi"], "ぶ": ["bu"], "べ": ["be"], "ぼ": ["bo"],
         "ぱ": ["pa"], "ぴ": ["pi"], "ぷ": ["pu"], "ぺ": ["pe"], "ぽ": ["po"],
+        "ぁ": ["xa", "la"], "ぃ": ["xi", "li"], "ぅ": ["xu", "lu"], "ぇ": ["xe", "le"], "ぉ": ["xo", "lo"],
+        "んな": ["nnna", "n'a"], "んに": ["nnni", "n'i"], "んぬ": ["nnnu", "n'u"], "んね": ["nnne", "n'e"], "んの": ["nnno", "n'o"],
         "ふぁ": ["fa"], "ふぃ": ["fi"], "ふぇ": ["fe"], "ふぉ": ["fo"],
         "てゃ": ["tha"], "てぃ": ["thi"], "てゅ": ["thu"], "てぇ": ["the"], "てょ": ["tho"],
-        "きゃ": ["kya"], "きゅ": ["kyu"], "きょ": ["kyo"],
-        "しゃ": ["sha", "sya"], "しゅ": ["shu", "syu"], "しょ": ["sho", "syo"],
-        "ちゃ": ["cha", "tya"], "ちゅ": ["chu", "tyu"], "ちょ": ["cho", "tyo"],
-        "にゃ": ["nya"], "にゅ": ["nyu"], "にょ": ["nyo"],
-        "ひゃ": ["hya"], "ひゅ": ["hyu"], "ひょ": ["hyo"],
-        "みゃ": ["mya"], "みゅ": ["myu"], "みょ": ["myo"],
-        "りゃ": ["rya"], "りゅ": ["ryu"], "りょ": ["ryo"],
-        "ぎゃ": ["gya"], "ぎゅ": ["gyu"], "ぎぇ": ["gye"], "ぎょ": ["gyo"],
-        "じゃ": ["ja", "zya"], "じゅ": ["ju", "zyu"], "じぇ": ["je", "zye"], "じょ": ["jo", "zyo"],
-        "びゃ": ["bya"], "びゅ": ["byu"], "びょ": ["byo"],
-        "ぴゃ": ["pya"], "ぴゅ": ["pyu"], "ぴょ": ["pyo"],
+        "きゃ": ["kya", "kixya", "kilya"], "きゅ": ["kyu", "kixyu", "kilyu"], "きょ": ["kyo", "kixyo", "kilyo"],
+        "しゃ": ["sha", "sya", "sixya", "silya"], "しゅ": ["shu", "syu", "sixyu", "silyu"], "しょ": ["sho", "syo", "sixyo", "silyo"],
+        "ちゃ": ["cha", "tya", "chixya", "chilya"], "ちゅ": ["chu", "tyu", "chixyu", "chilyu"], "ちょ": ["cho", "tyo", "chixyo", "chilyo"],
+        "にゃ": ["nya", "nixya", "nilya"], "にゅ": ["nyu", "nixyu", "nilyu"], "にょ": ["nyo", "nixyo", "nilyo"],
+        "ひゃ": ["hya", "hixya", "hilya"], "ひゅ": ["hyu", "hixyu", "hilyu"], "ひょ": ["hyo", "hixyo", "hilyo"],
+        "みゃ": ["mya", "mixya", "milya"], "みゅ": ["myu", "mixyu", "milyu"], "みょ": ["myo", "mixyo", "milyo"],
+        "りゃ": ["rya", "rixya", "rilya"], "りゅ": ["ryu", "rixyu", "rilyu"], "りょ": ["ryo", "rixyo", "rilyo"],
+        "ぎゃ": ["gya", "gixya", "gilya"], "ぎゅ": ["gyu", "gixyu", "gilyu"], "ぎぇ": ["gye", "gixye", "gilye"], "ぎょ": ["gyo", "gixyo", "gilyo"],
+        "じゃ": ["ja", "zya", "jixya", "jilya"], "じゅ": ["ju", "zyu", "jixyu", "jilyu"], "じぇ": ["je", "zye", "jixye", "jilye"], "じょ": ["jo", "zyo", "jixyo", "jilyo"],
+        "びゃ": ["bya", "bixya", "bilya"], "びゅ": ["byu", "bixyu", "bilyu"], "びょ": ["byo", "bixyo", "bilyo"],
+        "ぴゃ": ["pya", "pixya", "pilya"], "ぴゅ": ["pyu", "pixyu", "pilyu"], "ぴょ": ["pyo", "pixyo", "pilyo"],
         "-": ["-"],
         "ー": ["-"],
         "。": ["."],
@@ -137,15 +139,21 @@ const result = document.querySelector('.result');
 const summary = document.querySelector('.summary');
 const recode_tabele = document.querySelector('.recodes table');
 
-const results = [];
+// データベース
+const DB = new Dexie('hogetyping');
+DB.version(1).stores({
+    result: '++id,date,mode,cpm,raw,mis,acc,miss_data'
+});
+
+let results = [];
 let miss = 0;
-const miss_data = {};
 let miss_ratio = [];
 let isFirstMiss = true;
 let start_time;
 
 let current_typed = "";
 let current_roma = "";
+let current_miss_data = {};
 let centenec;
 let roma_list;
 
@@ -156,9 +164,7 @@ const observer = new IntersectionObserver((entry) => {
             isDisplayInView = entry[0].isIntersecting;
         }
         if (elm.target == result && elm.isIntersecting) {
-            setSummary();
-            setMisskeys();
-            setRecode();
+            setResult();
         }
     });
 });
@@ -256,6 +262,17 @@ function setSummary() {
 function setMisskeys() {
     let max = 0;
     miss_ratio = [];
+    let miss_data = {};
+
+    results.forEach(result => {
+        Object.entries(result['miss_data']).forEach(val=>{
+            if (miss_data[val[0]] == undefined) {
+                miss_data[val[0]] = val[1];
+            } else {
+                miss_data[val[0]] += val[1];
+            }
+        });
+    });
 
     Object.values(miss_data).forEach(val=>max = max > val ? max : val);
     Object.entries(miss_data).forEach(val=>{
@@ -280,21 +297,45 @@ function setRecode() {
         elm.classList.add('recode');
         elm.innerHTML = `<td>${result['cpm']}</td><td>${result['raw']}</td><td>${result['mis']}</td><td>${result['acc']}</td>`;
         recode_tabele.appendChild(elm);
-    })
+    });
+}
+
+/**
+ * 結果を表示する関数
+ */
+async function setResult() {
+    DB.result.toArray().then(data => {
+        results = data;
+        setSummary();
+        setRecode();
+        setMisskeys();
+    });
+}
+
+/**
+ * 結果を保存する関数
+ * @param {Object} 結果配列
+ */
+async function saveResult(results) {
+    try {
+        await DB.result.add(results);
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 document.addEventListener('keypress', (e) => {
     if (e.key == 'Enter') {
         if (isDisplayInView) {
             if (!e.shiftKey) {
-                setSummary();
-                setRecode();
-                setMisskeys();
+                // タイピング画面でEnterで結果表示
                 summary.scrollIntoView({ behavior: "smooth" });
             } else {
+                // Shift+Enterで次の問題へ
                 setNext();
             }
         } else {
+            // 結果画面でEnterでトップへ
             container.scrollIntoView({ behavior: "smooth" });
             setNext();
         }
@@ -303,6 +344,7 @@ document.addEventListener('keypress', (e) => {
 
     if (!isDisplayInView) return;
 
+    // タイピング処理
     if (current_typed.length == 0 && miss == 0) {
         start_time = new Date();
     }
@@ -310,6 +352,7 @@ document.addEventListener('keypress', (e) => {
     let time = current_time.getTime() - start_time.getTime();
     for (let i = 0; i < roma_list.length; i++) {
         const roma = roma_list[i];
+        // 正解判定
         if (roma.substring(0, current_typed.length + 1) === current_typed + e.key) {
             current_roma = roma;
             current_typed += e.key;
@@ -322,8 +365,18 @@ document.addEventListener('keypress', (e) => {
             raw_elm.innerHTML = raw;
             mis_elm.innerHTML = miss;
 
+            // 終了判定
             if (current_roma === current_typed) {
-                results.push({ cpm: cpm, raw: raw, acc: acc, mis: miss });
+                saveResult({
+                    date: new Date(),
+                    mode: 'japanese-nomal',
+                    cpm: cpm,
+                    raw: raw,
+                    mis: miss,
+                    acc: acc,
+                    miss_data: current_miss_data,
+                });
+
                 setNext();
             }
 
@@ -334,10 +387,10 @@ document.addEventListener('keypress', (e) => {
             let r = current_roma.substring(current_typed.length, current_typed.length + 1);
             miss++;
             if (isFirstMiss) {
-                if (miss_data[r] != undefined) {
-                    miss_data[r]++;
+                if (current_miss_data[r] != undefined) {
+                    current_miss_data[r]++;
                 } else {
-                    miss_data[r] = 1;
+                    current_miss_data[r] = 1;
                 }
                 isFirstMiss = false;
             }
