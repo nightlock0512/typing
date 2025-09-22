@@ -158,6 +158,8 @@ let current_roma = "";
 let current_miss_data = {};
 let centenec;
 let roma_list;
+let current_log = [];
+let previous_log = [];
 
 let isDisplayInView = true;
 const observer = new IntersectionObserver((entry) => {
@@ -186,6 +188,7 @@ function setNext() {
     current_roma = roma_list[0];
     roma_disp.innerHTML = '<span class="notyped">' + current_roma + "</span>";
     miss = 0;
+    current_log = [];
 }
 setNext();
 
