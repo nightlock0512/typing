@@ -139,6 +139,8 @@ const result = document.querySelector('.result');
 const summary = document.querySelector('.summary');
 const recode_tabele = document.querySelector('.recodes table');
 
+const export_btn = document.querySelector('.export_btn');
+
 // データベース
 const DB = new Dexie('hogetyping');
 DB.version(1).stores({
@@ -159,7 +161,7 @@ let roma_list;
 
 let isDisplayInView = true;
 const observer = new IntersectionObserver((entry) => {
-    entry.forEach((elm)=>{
+    entry.forEach((elm) => {
         if (elm.target == display) {
             isDisplayInView = entry[0].isIntersecting;
         }
@@ -265,7 +267,7 @@ function setMisskeys() {
     let miss_data = {};
 
     results.forEach(result => {
-        Object.entries(result['miss_data']).forEach(val=>{
+        Object.entries(result['miss_data']).forEach(val => {
             if (miss_data[val[0]] == undefined) {
                 miss_data[val[0]] = val[1];
             } else {
@@ -274,11 +276,11 @@ function setMisskeys() {
         });
     });
 
-    Object.values(miss_data).forEach(val=>max = max > val ? max : val);
-    Object.entries(miss_data).forEach(val=>{
-        miss_ratio.push([val[0],val[1] / max]);
+    Object.values(miss_data).forEach(val => max = max > val ? max : val);
+    Object.entries(miss_data).forEach(val => {
+        miss_ratio.push([val[0], val[1] / max]);
     });
-    
+
     miss_ratio.forEach(val => {
         if (document.querySelector(`.keyboard .key[data-value="${val[0]}"]`) == undefined) {
             return;
@@ -401,4 +403,24 @@ document.addEventListener('keypress', (e) => {
         }
     }
     roma_disp.innerHTML = `<span class="typed">${current_typed}</span><spen class="notyped">${current_roma.substring(current_typed.length)}</span>`;
-})
+});
+
+export_btn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    DB.result.toArray().then(data => {
+        const json_data = JSON.stringify(data);
+        const blob = new Blob([json_data], { type: 'text/plain' });
+        const a = document.createElement('a');
+
+        a.href = URL.createObjectURL(blob);
+        a.download = 'typingdata_' +new Date() + '.json';
+
+        document.querySelector('.export').appendChild(a);
+        a.click();
+
+       a.remove();
+        URL.revokeObjectURL(a.href);
+
+    });
+});
