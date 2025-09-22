@@ -135,6 +135,8 @@ const acc_elm = document.querySelector('.score > .acc');
 const container = document.querySelector('.container');
 const display = document.querySelector('.display');
 
+const chart_canvas = document.querySelector('.chart > canvas');
+
 const result = document.querySelector('.result');
 const summary = document.querySelector('.summary');
 const recode_tabele = document.querySelector('.recodes table');
@@ -169,11 +171,89 @@ const observer = new IntersectionObserver((entry) => {
         }
         if (elm.target == result && elm.isIntersecting) {
             setResult();
+            console.log('set result')
         }
     });
 });
 observer.observe(display);
 observer.observe(result);
+
+const chart = new Chart(chart_canvas, {
+    type: 'line',
+    data: {
+        labels: previous_log.map(log => log.time),
+        datasets: [
+            {
+                label: 'CPM',
+                data: previous_log.map(log => log.cpm / 100),
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                yAxisID: 'y-cpm'
+            },
+            {
+                label: 'RAW',
+                data: previous_log.map(log => log.raw),
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                yAxisID: 'y-raw'
+            },
+            {
+                label: 'ACC',
+                data: previous_log.map(log => log.acc),
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                yAxisID: 'y-acc'
+            }
+        ]
+    },
+    options: {
+        scales: {
+            x: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Time (s)'
+                }
+            },
+            'y-cpm': {
+                type: 'linear',
+                position: 'left',
+                title: {
+                    display: true,
+                    text: 'CPM'
+                },
+                min: 0
+            },
+            'y-raw': {
+                type: 'linear',
+                position: 'right',
+                title: {
+                    display: true,
+                    text: 'RAW'
+                },
+                min: 0,
+                grid: {
+                    drawOnChartArea: false,
+                },
+            },
+            'y-acc': {
+                type: 'linear',
+                position: 'right',
+                title: {
+                    display: true,
+                    text: 'ACC'
+                },
+                min: 0,
+                max: 100,
+                grid: {
+                    drawOnChartArea: false,
+                },
+            }
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+    }
+});
 
 /**
  * 次の問題をセットする関数
@@ -306,6 +386,18 @@ function setRecode() {
 }
 
 /**
+ * チャートを表示する関数
+ */
+function setChart() {
+    chart.data.labels = previous_log.map(log => Math.floor(log.time / 10) / 100);
+    chart.data.datasets[0].data = previous_log.map(log => log.cpm);
+    chart.data.datasets[1].data = previous_log.map(log => log.raw);
+    chart.data.datasets[2].data = previous_log.map(log => log.acc);
+
+    chart.update();
+}
+
+/**
  * 結果を表示する関数
  */
 async function setResult() {
@@ -314,6 +406,7 @@ async function setResult() {
         setSummary();
         setRecode();
         setMisskeys();
+        setChart();
     });
 }
 
@@ -334,7 +427,7 @@ document.addEventListener('keypress', (e) => {
         if (isDisplayInView) {
             if (!e.shiftKey) {
                 // タイピング画面でEnterで結果表示
-                summary.scrollIntoView({ behavior: "smooth" });
+                result.scrollIntoView({ behavior: "smooth" });
             } else {
                 // Shift+Enterで次の問題へ
                 setNext();
@@ -355,12 +448,14 @@ document.addEventListener('keypress', (e) => {
     }
     let current_time = new Date();
     let time = current_time.getTime() - start_time.getTime();
+
     for (let i = 0; i < roma_list.length; i++) {
         const roma = roma_list[i];
         // 正解判定
         if (roma.substring(0, current_typed.length + 1) === current_typed + e.key) {
             current_roma = roma;
             current_typed += e.key;
+
 
             const acc = Math.floor(current_typed.length / (current_typed.length + miss) * 1000) / 10;
             const cpm = Math.floor(current_typed.length / (time / 1000) * 60 * 10) / 10;
@@ -369,7 +464,19 @@ document.addEventListener('keypress', (e) => {
             cpm_elm.innerHTML = cpm;
             raw_elm.innerHTML = raw;
             mis_elm.innerHTML = miss;
+            
+            current_log.push({
+                time: new Date().getTime() - start_time.getTime(),
+                pressedKey: e.key,
+                correctKey: current_roma.substring(current_typed.length, current_typed.length + 1),
+                judge: 'correct',
+                acc: acc,
+                cpm: cpm,
+                raw: raw,
+                mis: miss,
+            });
 
+            
             // 終了判定
             if (current_roma === current_typed) {
                 saveResult({
@@ -381,12 +488,15 @@ document.addEventListener('keypress', (e) => {
                     acc: acc,
                     miss_data: current_miss_data,
                 });
-
+                
+                previous_log = current_log;
+                
                 setNext();
             }
 
-            isFirstMiss = true;
 
+            isFirstMiss = true;
+            
             break;
         } else if (i == roma_list.length - 1) {
             let r = current_roma.substring(current_typed.length, current_typed.length + 1);
@@ -395,14 +505,29 @@ document.addEventListener('keypress', (e) => {
                 if (current_miss_data[r] != undefined) {
                     current_miss_data[r]++;
                 } else {
+
                     current_miss_data[r] = 1;
                 }
                 isFirstMiss = false;
             }
-            acc_elm.innerHTML = Math.floor(current_typed.length / (current_typed.length + miss) * 1000) / 10 + "%";
-            cpm_elm.innerHTML = Math.floor(current_typed.length / (time / 1000) * 60 * 10) / 10;
-            raw_elm.innerHTML = Math.floor((current_typed.length + miss) / (time / 1000) * 60 * 10) / 10;
+            const acc = Math.floor(current_typed.length / (current_typed.length + miss) * 1000) / 10;
+            const cpm = Math.floor(current_typed.length / (time / 1000) * 60 * 10) / 10;
+            const raw = Math.floor((current_typed.length + miss) / (time / 1000) * 60 * 10) / 10;
+            acc_elm.innerHTML = acc + "%";
+            cpm_elm.innerHTML = cpm;
+            raw_elm.innerHTML = raw;
             mis_elm.innerHTML = miss;
+
+            current_log.push({
+                time: new Date().getTime() - start_time.getTime(),
+                pressedKey: e.key,
+                correctKey: r,
+                judge: 'miss',
+                acc: acc,
+                cpm: cpm,
+                raw: raw,
+                mis: miss,
+            });
         }
     }
     roma_disp.innerHTML = `<span class="typed">${current_typed}</span><spen class="notyped">${current_roma.substring(current_typed.length)}</span>`;
@@ -417,13 +542,12 @@ export_btn.addEventListener('click', (e) => {
         const a = document.createElement('a');
 
         a.href = URL.createObjectURL(blob);
-        a.download = 'typingdata_' +new Date() + '.json';
+        a.download = 'typingdata_' + new Date().getTime() + '.json';
 
         document.querySelector('.export').appendChild(a);
         a.click();
 
        a.remove();
         URL.revokeObjectURL(a.href);
-
     });
 });

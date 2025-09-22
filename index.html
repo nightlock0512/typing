@@ -26,6 +26,17 @@
         </div>
         <div class="result_wrap">
             <div class="result">
+                <section class="previous_result">
+                    <div>
+                        <div class="cpm"></div>
+                        <div class="raw"></div>
+                        <div class="mis"></div>
+                        <div class="acc"></div>
+                    </div>
+                </section>
+                <section class="chart">
+                    <canvas class="chart_canvas"></canvas>
+                </section>
                 <section class="summary">
                     <div class="cpm">
                         <div class="label">
@@ -153,6 +164,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <script src="text_list.js"></script>
     <script src="main.js"></script>

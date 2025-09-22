@@ -72,7 +72,8 @@
 
 .result {
     width: 85vw;
-    margin: 50px auto;
+    margin: 25px auto;
+    padding-top: 25px;
 }
 
 .summary {
@@ -80,6 +81,7 @@
     align-items: center;
     justify-content: center;
     gap: 2%;
+    margin-top: 50px;
 }
 
 .summary>div {
@@ -169,4 +171,9 @@
 .space {
     width: 350px;
     /* スペースキーはかなり広めに */
+}
+
+.chart_canvas {
+    display: block;
+    width: 100%;
 }
