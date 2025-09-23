@@ -105,6 +105,11 @@
     border-top: solid 1px silver;
 }
 
+.recodes .tabele_wrap {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
 .recodes table tr:nth-child(2n+1) {
     background: silver;
 }
@@ -176,4 +181,22 @@
 .chart_canvas {
     display: block;
     width: 100%;
+    height: 300px;
+}
+
+.previous_result .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin: 30px 5px;
+    padding: 15px;
+    border-radius: 15px;
+    background-color: silver;
+    width: 100%;
+}
+
+.previous_result {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }

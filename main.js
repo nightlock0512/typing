@@ -132,6 +132,11 @@ const raw_elm = document.querySelector('.score > .raw');
 const mis_elm = document.querySelector('.score > .mis');
 const acc_elm = document.querySelector('.score > .acc');
 
+const previous_result_cpm_elm = document.querySelector('.previous_result .cpm .value');
+const previous_result_raw_elm = document.querySelector('.previous_result .raw .value');
+const previous_result_mis_elm = document.querySelector('.previous_result .mis .value');
+const previous_result_acc_elm = document.querySelector('.previous_result .acc .value');
+
 const container = document.querySelector('.container');
 const display = document.querySelector('.display');
 
@@ -398,6 +403,16 @@ function setChart() {
 }
 
 /**
+ * 前回の記録を表示する関数
+ */
+function setPreviousResult() {
+    previous_result_acc_elm.innerHTML = previous_log[previous_log.length - 1]['acc'] + "%";
+    previous_result_cpm_elm.innerHTML = previous_log[previous_log.length - 1]['cpm'];
+    previous_result_raw_elm.innerHTML = previous_log[previous_log.length - 1]['raw'];
+    previous_result_mis_elm.innerHTML = previous_log[previous_log.length - 1]['mis'];
+}
+
+/**
  * 結果を表示する関数
  */
 async function setResult() {
@@ -407,6 +422,7 @@ async function setResult() {
         setRecode();
         setMisskeys();
         setChart();
+        setPreviousResult();
     });
 }
 
@@ -551,3 +567,4 @@ export_btn.addEventListener('click', (e) => {
         URL.revokeObjectURL(a.href);
     });
 });
+
