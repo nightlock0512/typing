@@ -176,7 +176,6 @@ const observer = new IntersectionObserver((entry) => {
         }
         if (elm.target == result && elm.isIntersecting) {
             setResult();
-            console.log('set result')
         }
     });
 });
