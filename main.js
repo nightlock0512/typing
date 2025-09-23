@@ -274,6 +274,7 @@ function setNext() {
     roma_disp.innerHTML = '<span class="notyped">' + current_roma + "</span>";
     miss = 0;
     current_log = [];
+    current_miss_data = {};
 }
 setNext();
 
