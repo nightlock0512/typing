@@ -184,6 +184,7 @@ function setNext() {
     current_roma = roma_list[0];
     roma_disp.innerHTML = '<span class="notyped">' + current_roma + "</span>";
     miss = 0;
+    current_miss_data = {};
 }
 setNext();
 
