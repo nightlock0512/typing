@@ -1,32 +1,8 @@
-import { hiraganaToRomaji } from './romajiConverter.js';
-import { centenec_list } from './text_list.js';
-import { DB } from './db.js';
+import hiraganaToRomaji from './romajiConverter.js';
+import centenec_list from './text_list.js';
+import DB from './db.js';
+import ui from './ui.js';
 
-
-const kanji_disp = document.querySelector('.display > .kanji');
-const kana_disp = document.querySelector('.display > .kana');
-const roma_disp = document.querySelector('.display > .roma');
-
-const cpm_elm = document.querySelector('.score > .cpm');
-const raw_elm = document.querySelector('.score > .raw');
-const mis_elm = document.querySelector('.score > .mis');
-const acc_elm = document.querySelector('.score > .acc');
-
-const previous_result_cpm_elm = document.querySelector('.previous_result .cpm .value');
-const previous_result_raw_elm = document.querySelector('.previous_result .raw .value');
-const previous_result_mis_elm = document.querySelector('.previous_result .mis .value');
-const previous_result_acc_elm = document.querySelector('.previous_result .acc .value');
-
-const container = document.querySelector('.container');
-const display = document.querySelector('.display');
-
-const chart_canvas = document.querySelector('.chart > canvas');
-
-const result = document.querySelector('.result');
-const summary = document.querySelector('.summary');
-const recode_tabele = document.querySelector('.recodes table');
-
-const export_btn = document.querySelector('.export_btn');
 
 let results = [];
 let miss = 0;
@@ -43,20 +19,9 @@ let current_log = [];
 let previous_log = [];
 
 let isDisplayInView = true;
-const observer = new IntersectionObserver((entry) => {
-    entry.forEach((elm) => {
-        if (elm.target == display) {
-            isDisplayInView = entry[0].isIntersecting;
-        }
-        if (elm.target == result && elm.isIntersecting) {
-            setResult();
-        }
-    });
-});
-observer.observe(display);
-observer.observe(result);
 
-const chart = new Chart(chart_canvas, {
+
+const chart = new Chart(ui.chart_canvasElm, {
     type: 'line',
     data: {
         labels: previous_log.map(log => log.time),
@@ -139,12 +104,12 @@ const chart = new Chart(chart_canvas, {
 function setNext() {
     current_typed = "";
     centenec = centenec_list[Math.floor(centenec_list.length * Math.random())];
-    kanji_disp.innerHTML = centenec.kanji;
-    kana_disp.innerHTML = centenec.kana;
+    ui.display.kanjiElm.innerHTML = centenec.kanji;
+    ui.display.kanaElm.innerHTML = centenec.kana;
 
     roma_list = hiraganaToRomaji(centenec.kana);
     current_roma = roma_list[0];
-    roma_disp.innerHTML = '<span class="notyped">' + current_roma + "</span>";
+    ui.display.romaElm.innerHTML = '<span class="notyped">' + current_roma + "</span>";
     miss = 0;
     current_log = [];
     current_miss_data = {};
@@ -172,13 +137,17 @@ function setSummary() {
     const acc_ave_elm = document.querySelector('.summary .acc .ave');
 
     let cpm_min = Infinity;
-    let cpm_max = cpm_ave = 0;
+    let cpm_max = 0;
+    let cpm_ave = 0;
     let raw_min = Infinity;
-    let raw_max = raw_ave = 0;
+    let raw_max = 0;
+    let raw_ave = 0;
     let mis_min = Infinity;
-    let mis_max = mis_ave = 0;
+    let mis_max = 0;
+    let mis_ave = 0;
     let acc_min = Infinity;
-    let acc_max = acc_ave = 0;
+    let acc_max = 0;
+    let acc_ave = 0;
 
     results.forEach(result => {
         cpm_ave += result['cpm'];
@@ -255,12 +224,12 @@ function setMisskeys() {
  * 記録の一覧表を生成
  */
 function setRecode() {
-    recode_tabele.innerHTML = '<tr class="headline"><th>CPM</th><th>RAW</th><th>MIS</th><th>ACC</th></tr>';
+    ui.recode_tabeleElm.innerHTML = '<tr class="headline"><th>CPM</th><th>RAW</th><th>MIS</th><th>ACC</th></tr>';
     results.toReversed().forEach((result) => {
         const elm = document.createElement('tr');
         elm.classList.add('recode');
         elm.innerHTML = `<td>${result['cpm']}</td><td>${result['raw']}</td><td>${result['mis']}</td><td>${result['acc']}</td>`;
-        recode_tabele.appendChild(elm);
+        ui.recode_tabeleElm.appendChild(elm);
     });
 }
 
@@ -280,15 +249,16 @@ function setChart() {
  * 前回の記録を表示する関数
  */
 function setPreviousResult() {
-    previous_result_acc_elm.innerHTML = previous_log[previous_log.length - 1]['acc'] + "%";
-    previous_result_cpm_elm.innerHTML = previous_log[previous_log.length - 1]['cpm'];
-    previous_result_raw_elm.innerHTML = previous_log[previous_log.length - 1]['raw'];
-    previous_result_mis_elm.innerHTML = previous_log[previous_log.length - 1]['mis'];
+    ui.previous_result.accElm.innerHTML = previous_log[previous_log.length - 1]['acc'] + "%";
+    ui.previous_result.cpmElm.innerHTML = previous_log[previous_log.length - 1]['cpm'];
+    ui.previous_result.rawElm.innerHTML = previous_log[previous_log.length - 1]['raw'];
+    ui.previous_result.misElm.innerHTML = previous_log[previous_log.length - 1]['mis'];
+
 }
 
 /**
  * 結果を表示する関数
- */
+*/
 async function setResult() {
     DB.result.toArray().then(data => {
         results = data;
@@ -298,6 +268,7 @@ async function setResult() {
         setChart();
         setPreviousResult();
     });
+
 }
 
 /**
@@ -312,19 +283,32 @@ async function saveResult(results) {
     }
 }
 
+const observer = new IntersectionObserver((entry) => {
+    entry.forEach((elm) => {
+        if (elm.target == ui.displayElm) {
+            isDisplayInView = entry[0].isIntersecting;
+        }
+        if (elm.target == ui.resultElm && elm.isIntersecting) {
+            setResult();
+        }
+    });
+});
+observer.observe(ui.displayElm);
+observer.observe(ui.resultElm);
+
 document.addEventListener('keypress', (e) => {
     if (e.key == 'Enter') {
         if (isDisplayInView) {
             if (!e.shiftKey) {
                 // タイピング画面でEnterで結果表示
-                result.scrollIntoView({ behavior: "smooth" });
+                ui.resultElm.scrollIntoView({ behavior: "smooth" });
             } else {
                 // Shift+Enterで次の問題へ
                 setNext();
             }
         } else {
             // 結果画面でEnterでトップへ
-            container.scrollIntoView({ behavior: "smooth" });
+            ui.containerElm.scrollIntoView({ behavior: "smooth" });
             setNext();
         }
         return;
@@ -350,10 +334,10 @@ document.addEventListener('keypress', (e) => {
             const acc = Math.floor(current_typed.length / (current_typed.length + miss) * 1000) / 10;
             const cpm = Math.floor(current_typed.length / (time / 1000) * 60 * 10) / 10;
             const raw = Math.floor((current_typed.length + miss) / (time / 1000) * 60 * 10) / 10;
-            acc_elm.innerHTML = acc + "%";
-            cpm_elm.innerHTML = cpm;
-            raw_elm.innerHTML = raw;
-            mis_elm.innerHTML = miss;
+            ui.score.accElm.innerHTML = acc + "%";
+            ui.score.cpmElm.innerHTML = cpm;
+            ui.score.rawElm.innerHTML = raw;
+            ui.score.misElm.innerHTML = miss;
             
             current_log.push({
                 time: new Date().getTime() - start_time.getTime(),
@@ -403,10 +387,10 @@ document.addEventListener('keypress', (e) => {
             const acc = Math.floor(current_typed.length / (current_typed.length + miss) * 1000) / 10;
             const cpm = Math.floor(current_typed.length / (time / 1000) * 60 * 10) / 10;
             const raw = Math.floor((current_typed.length + miss) / (time / 1000) * 60 * 10) / 10;
-            acc_elm.innerHTML = acc + "%";
-            cpm_elm.innerHTML = cpm;
-            raw_elm.innerHTML = raw;
-            mis_elm.innerHTML = miss;
+            ui.score.accElm.innerHTML = acc + "%";
+            ui.score.cpmElm.innerHTML = cpm;
+            ui.score.rawElm.innerHTML = raw;
+            ui.score.misElm.innerHTML = miss;
 
             current_log.push({
                 time: new Date().getTime() - start_time.getTime(),
@@ -420,10 +404,10 @@ document.addEventListener('keypress', (e) => {
             });
         }
     }
-    roma_disp.innerHTML = `<span class="typed">${current_typed}</span><spen class="notyped">${current_roma.substring(current_typed.length)}</span>`;
+    ui.display.romaElm.innerHTML = `<span class="typed">${current_typed}</span><spen class="notyped">${current_roma.substring(current_typed.length)}</span>`;
 });
 
-export_btn.addEventListener('click', (e) => {
+ui.export_btnElm.addEventListener('click', (e) => {
     e.preventDefault();
 
     DB.result.toArray().then(data => {
@@ -441,4 +425,3 @@ export_btn.addEventListener('click', (e) => {
         URL.revokeObjectURL(a.href);
     });
 });
-

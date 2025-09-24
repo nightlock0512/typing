@@ -1,4 +1,4 @@
-export const DB = new Dexie('hogetyping');
+const DB = new Dexie('hogetyping');
 DB.version(2).stores({
     result: '++id,date,mode,cpm,raw,mis,acc,miss_data'
 }).upgrade(tx => {
@@ -13,3 +13,5 @@ DB.version(2).stores({
 DB.version(1).stores({
     result: '++id,date,mode,cpm,raw,mis,acc,miss_data'
 });
+
+export default DB;

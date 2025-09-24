@@ -1,4 +1,4 @@
-export const centenec_list = [
+const centenec_list = [
     {
         "kanji": "今日はいい天気ですね。",
         "kana": "きょうはいいてんきですね。"
@@ -1263,4 +1263,6 @@ export const centenec_list = [
         "kanji": "一緒にテニスをしようよ。",
         "kana": "いっしょにてにすをしようよ。"
     }
-]
+];
+
+export default centenec_list;
