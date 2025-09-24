@@ -1263,4 +1263,6 @@ const centenec_list = [
         "kanji": "一緒にテニスをしようよ。",
         "kana": "いっしょにてにすをしようよ。"
     }
-]
+];
+
+export default centenec_list;
