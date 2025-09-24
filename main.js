@@ -141,6 +141,17 @@ const recode_tabele = document.querySelector('.recodes table');
 
 // データベース
 const DB = new Dexie('hogetyping');
+DB.version(2).stores({
+    result: '++id,date,mode,cpm,raw,mis,acc,miss_data'
+}).upgrade(tx => {
+    const thresholdDate = new Date('2025-09-23T12:23:00.000Z'); // GMT+9を考慮したUTC時間
+
+    return tx.result
+        .where('date').above(thresholdDate)
+        .modify(result => {
+            result.miss_data = {};
+        });
+});
 DB.version(1).stores({
     result: '++id,date,mode,cpm,raw,mis,acc,miss_data'
 });
@@ -159,7 +170,7 @@ let roma_list;
 
 let isDisplayInView = true;
 const observer = new IntersectionObserver((entry) => {
-    entry.forEach((elm)=>{
+    entry.forEach((elm) => {
         if (elm.target == display) {
             isDisplayInView = entry[0].isIntersecting;
         }
@@ -266,7 +277,7 @@ function setMisskeys() {
     let miss_data = {};
 
     results.forEach(result => {
-        Object.entries(result['miss_data']).forEach(val=>{
+        Object.entries(result['miss_data']).forEach(val => {
             if (miss_data[val[0]] == undefined) {
                 miss_data[val[0]] = val[1];
             } else {
@@ -275,11 +286,11 @@ function setMisskeys() {
         });
     });
 
-    Object.values(miss_data).forEach(val=>max = max > val ? max : val);
-    Object.entries(miss_data).forEach(val=>{
-        miss_ratio.push([val[0],val[1] / max]);
+    Object.values(miss_data).forEach(val => max = max > val ? max : val);
+    Object.entries(miss_data).forEach(val => {
+        miss_ratio.push([val[0], val[1] / max]);
     });
-    
+
     miss_ratio.forEach(val => {
         if (document.querySelector(`.keyboard .key[data-value="${val[0]}"]`) == undefined) {
             return;
