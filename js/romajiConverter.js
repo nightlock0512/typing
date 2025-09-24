@@ -3,7 +3,7 @@
  * @param {string} hiraganaStr 変換したいひらがなの文字列
  * @returns {string[]} ローマ字に変換された文字列の配列
  */
-export function hiraganaToRomaji(hiraganaStr) {
+function hiraganaToRomaji(hiraganaStr) {
     const romajiMap = {
         "あ": ["a"], "い": ["i"], "う": ["u"], "え": ["e"], "お": ["o"],
         "か": ["ka"], "き": ["ki"], "く": ["ku"], "け": ["ke"], "こ": ["ko"],
@@ -122,3 +122,5 @@ export function hiraganaToRomaji(hiraganaStr) {
 
     return generateCombinations(hiraganaStr);
 }
+
+export default hiraganaToRomaji;
