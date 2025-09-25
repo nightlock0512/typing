@@ -29,6 +29,10 @@ const summaryElm = document.querySelector('.summary');
 const recode_tabeleElm = document.querySelector('.recodes table');
 const export_btnElm = document.querySelector('.export_btn');
 
+const share = {
+    twitterElm: document.querySelector('.share .twitter'),
+    navigateElm: document.querySelector('.share .navigate-share'),
+}
 
 const ui = {
     displayElm: displayElm,
@@ -43,6 +47,7 @@ const ui = {
     summaryElm: summaryElm,
     recode_tabeleElm: recode_tabeleElm,
     export_btnElm: export_btnElm,
+    share: share,
 }
 
 export default ui;

@@ -16,7 +16,7 @@ let current_miss_data = {};
 let centenec;
 let roma_list;
 let current_log = [];
-let previous_log = [];
+let previous_log;
 
 let isDisplayInView = true;
 
@@ -24,25 +24,25 @@ let isDisplayInView = true;
 const chart = new Chart(ui.chart_canvasElm, {
     type: 'line',
     data: {
-        labels: previous_log.map(log => log.time),
+        labels: '',
         datasets: [
             {
                 label: 'CPM',
-                data: previous_log.map(log => log.cpm / 100),
+                data: [],
                 borderColor: 'rgb(255, 99, 132)',
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 yAxisID: 'y-cpm'
             },
             {
                 label: 'RAW',
-                data: previous_log.map(log => log.raw),
+                data: [],
                 borderColor: 'rgb(54, 162, 235)',
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 yAxisID: 'y-raw'
             },
             {
                 label: 'ACC',
-                data: previous_log.map(log => log.acc),
+                data: [],
                 borderColor: 'rgb(75, 192, 192)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 yAxisID: 'y-acc'
@@ -253,7 +253,37 @@ function setPreviousResult() {
     ui.previous_result.cpmElm.innerHTML = previous_log[previous_log.length - 1]['cpm'];
     ui.previous_result.rawElm.innerHTML = previous_log[previous_log.length - 1]['raw'];
     ui.previous_result.misElm.innerHTML = previous_log[previous_log.length - 1]['mis'];
+}
 
+/**
+ * シェアボタンの動作
+ */
+function setShareBtn() {
+    if (previous_log != undefined) {
+        ui.share.twitterElm.classList.add('active');
+        ui.share.twitterElm.onclick = (e) => {
+            open(`https://twitter.com/intent/tweet?url=https://nightlock0512.github.io/typing/&text=日本語タイピングで CPM: ${previous_log[previous_log.length - 1]['cpm']} ACC: ${previous_log[previous_log.length - 1]['acc']} でした。&hashtags=タイピング`)
+        };
+    }
+
+    if (navigator.share && previous_log != undefined) {
+        ui.share.navigateElm.classList.add('active');
+        ui.share.navigateElm.onclick = async (e) => {
+            const shareData = {
+                title: document.title, // ページのタイトル
+                text: `日本語タイピングで CPM: ${previous_log[previous_log.length - 1]['cpm']} ACC: ${previous_log[previous_log.length - 1]['acc']}% でした。`,
+                url: 'https://nightlock0512.github.io/typing' // 現在のページのURL
+            };
+
+            try {
+                // navigator.share()はPromiseを返す
+                await navigator.share(shareData);
+                console.log('共有が成功しました');
+            } catch (err) {
+                console.error(`共有エラー: ${err}`);
+            }
+        };
+    }
 }
 
 /**
@@ -267,8 +297,8 @@ async function setResult() {
         setMisskeys();
         setChart();
         setPreviousResult();
+        setShareBtn();
     });
-
 }
 
 /**
