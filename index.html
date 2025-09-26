@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>タイピング</title>
-    <link rel="shortcut icon" href="icon.png" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="./images/icon.png" type="image/x-icon">
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 
 <body>
@@ -26,6 +26,38 @@
         </div>
         <div class="result_wrap">
             <div class="result">
+                <section class="previous_result">
+                    <div style="font-size: 1.3em;">Results</div>
+                    <div class="inner">
+                        <div class="cpm">
+                            <span class="label">CPM : </span>
+                            <span class="value"></span>
+                        </div>
+                        <div class="raw">
+                            <span class="label">RAW : </span>
+                            <span class="value"></span>
+                        </div>
+                        <div class="mis">
+                            <span class="label">MIS : </span>
+                            <span class="value"></span>
+                        </div>
+                        <div class="acc">
+                            <span class="label">ACC : </span>
+                            <span class="value"></span>
+                        </div>
+                    </div>
+                    <div class="share">
+                        <div class="twitter">
+                            <img src="./images/x-logo.svg" alt="" width="40">
+                        </div>
+                        <div class="navigate-share">
+                            <img src="./images/share-icon.svg" alt="" width="40">
+                        </div>
+                    </div>
+                </section>
+                <section class="chart">
+                    <canvas class="chart_canvas"></canvas>
+                </section>
                 <section class="summary">
                     <div class="cpm">
                         <div class="label">
@@ -137,22 +169,33 @@
                     </div>
                 </section>
                 <section class="recodes">
-                    <table>
-                        <tr class="headline">
-                            <th>CPM</th>
-                            <th>RAW</th>
-                            <th>MIS</th>
-                            <th>ACC</th>
-                        </tr>
-                    </table>
+                    <div class="export">
+                        <div class="export_btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff">
+                            <path
+                                d="M480-480ZM202-65l-56-57 118-118h-90v-80h226v226h-80v-89L202-65Zm278-15v-80h240v-440H520v-200H240v400h-80v-400q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H480Z" />
+                            </svg>
+                            Export
+                        </div>
+                    </div>
+                    <div class="tabele_wrap">
+                        <table>
+                            <tr class="headline">
+                                <th>CPM</th>
+                                <th>RAW</th>
+                                <th>MIS</th>
+                                <th>ACC</th>
+                            </tr>
+                        </table>
+                    </div>
                 </section>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
-    <script src="text_list.js"></script>
-    <script src="main.js"></script>
+    <script type="module" src="./js/main.js"></script>
 </body>
 
 </html>
